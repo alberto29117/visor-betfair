@@ -1,5 +1,3 @@
-const fetch = require('node-fetch');
-
 exports.handler = async function (event, context) {
   // Solo permitimos peticiones de tipo POST
   if (event.httpMethod !== 'POST') {
@@ -17,7 +15,7 @@ exports.handler = async function (event, context) {
 
     const BETFAIR_API_URL = 'https://api.betfair.com/exchange/betting/json-rpc/v1';
 
-    // Hacemos la llamada a la API de Betfair
+    // Hacemos la llamada a la API de Betfair usando el 'fetch' nativo
     const response = await fetch(BETFAIR_API_URL, {
       method: 'POST',
       headers: {
