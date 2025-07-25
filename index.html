@@ -98,7 +98,6 @@
         const loadingMessage = document.getElementById('loadingMessage');
         const errorContainer = document.getElementById('errorContainer');
 
-        // *** CAMBIO CLAVE: Usamos un proxy para evitar errores de CORS en GitHub Pages ***
         const PROXY_URL = 'https://proxy.cors.sh/';
         const BETFAIR_API_URL = 'https://api.betfair.com/exchange/betting/json-rpc/v1';
         
@@ -176,9 +175,6 @@
 
         /**
          * Genera el informe de texto completo.
-         * @param {Array} markets - Datos del catálogo de mercados.
-         * @param {Array} marketBooks - Datos de las cuotas de los mercados.
-         * @returns {string} - El informe de texto formateado.
          */
         function generateTextReport(markets, marketBooks) {
             let report = `INFORME DE CARRERAS DE CABALLOS - ${new Date().toLocaleString('es-ES')}\n`;
@@ -202,7 +198,6 @@
                     const runnerBook = book.runners.find(rb => rb.selectionId === runnerDesc.selectionId);
                     const price = runnerBook?.ex?.availableToBack[0]?.price?.toString() ?? 'N/A';
                     
-                    // Alinear el texto en la tabla
                     const horseNamePadded = runnerDesc.runnerName.padEnd(42, ' ');
                     const pricePadded = price.padStart(12, ' ');
 
@@ -223,10 +218,8 @@
             const subject = `Informe de Carreras de Caballos - ${new Date().toLocaleDateString('es-ES')}`;
             const body = reportContent.textContent;
 
-            // Creamos el enlace mailto y lo codificamos para que sea seguro en una URL
             const mailtoLink = `mailto:${recipient}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 
-            // Abrimos el cliente de correo
             window.location.href = mailtoLink;
         }
 
@@ -237,13 +230,11 @@
             const appKey = appKeyInput.value.trim();
             const sessionToken = sessionTokenInput.value.trim();
 
-            // *** CAMBIO CLAVE: Se añade la URL del proxy a la petición fetch ***
             const response = await fetch(PROXY_URL + BETFAIR_API_URL, {
                 method: 'POST',
                 body: JSON.stringify(body),
                 headers: {
-                    // *** CAMBIO CLAVE: Se añaden las cabeceras requeridas por el proxy y Betfair ***
-                    'x-cors-api-key': 'temp_1234567890', // Clave temporal para el proxy
+                    // Se ha eliminado la cabecera 'x-cors-api-key' que podría causar problemas.
                     'X-Application': appKey,
                     'X-Authentication': sessionToken,
                     'Content-Type': 'application/json',
@@ -251,9 +242,16 @@
                 }
             });
 
-            if (!response.ok) throw new Error(`Error de red o del proxy: ${response.status} ${response.statusText}`);
+            if (!response.ok) {
+                // Se añade un mensaje de error más detallado.
+                const errorText = await response.text();
+                throw new Error(`Error de red o del proxy: ${response.status} ${response.statusText}. Respuesta del servidor: ${errorText}`);
+            }
+            
             const data = await response.json();
-            if (data.error) throw new Error(`Error de la API de Betfair: ${data.error.message} (${data.error.data?.exceptionname})`);
+            if (data.error) {
+                throw new Error(`Error de la API de Betfair: ${data.error.message} (${data.error.data?.exceptionname})`);
+            }
             
             return data;
         }
