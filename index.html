@@ -98,8 +98,8 @@
         const loadingMessage = document.getElementById('loadingMessage');
         const errorContainer = document.getElementById('errorContainer');
 
-        // *** CAMBIO CLAVE: Se utiliza un proxy CORS diferente y más estable ***
-        const PROXY_URL = 'https://thingproxy.freeboard.io/fetch/';
+        // *** CAMBIO CLAVE: Se utiliza un proxy CORS diferente y más fiable ***
+        const PROXY_URL = 'https://api.allorigins.win/raw?url=';
         const BETFAIR_API_URL = 'https://api.betfair.com/exchange/betting/json-rpc/v1';
         
         // Event Listeners
@@ -231,7 +231,10 @@
             const appKey = appKeyInput.value.trim();
             const sessionToken = sessionTokenInput.value.trim();
 
-            const response = await fetch(PROXY_URL + BETFAIR_API_URL, {
+            // *** CAMBIO CLAVE: La URL de la API de Betfair se codifica para pasarla como parámetro al proxy ***
+            const fetchUrl = PROXY_URL + encodeURIComponent(BETFAIR_API_URL);
+
+            const response = await fetch(fetchUrl, {
                 method: 'POST',
                 body: JSON.stringify(body),
                 headers: {
