@@ -98,7 +98,8 @@
         const loadingMessage = document.getElementById('loadingMessage');
         const errorContainer = document.getElementById('errorContainer');
 
-        const PROXY_URL = 'https://proxy.cors.sh/';
+        // *** CAMBIO CLAVE: Se utiliza un proxy CORS diferente y más estable ***
+        const PROXY_URL = 'https://thingproxy.freeboard.io/fetch/';
         const BETFAIR_API_URL = 'https://api.betfair.com/exchange/betting/json-rpc/v1';
         
         // Event Listeners
@@ -234,7 +235,6 @@
                 method: 'POST',
                 body: JSON.stringify(body),
                 headers: {
-                    // Se ha eliminado la cabecera 'x-cors-api-key' que podría causar problemas.
                     'X-Application': appKey,
                     'X-Authentication': sessionToken,
                     'Content-Type': 'application/json',
@@ -243,7 +243,6 @@
             });
 
             if (!response.ok) {
-                // Se añade un mensaje de error más detallado.
                 const errorText = await response.text();
                 throw new Error(`Error de red o del proxy: ${response.status} ${response.statusText}. Respuesta del servidor: ${errorText}`);
             }
