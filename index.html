@@ -98,6 +98,8 @@
         const loadingMessage = document.getElementById('loadingMessage');
         const errorContainer = document.getElementById('errorContainer');
 
+        // *** CAMBIO CLAVE: Usamos un proxy para evitar errores de CORS en GitHub Pages ***
+        const PROXY_URL = 'https://proxy.cors.sh/';
         const BETFAIR_API_URL = 'https://api.betfair.com/exchange/betting/json-rpc/v1';
         
         // Event Listeners
@@ -235,10 +237,13 @@
             const appKey = appKeyInput.value.trim();
             const sessionToken = sessionTokenInput.value.trim();
 
-            const response = await fetch(BETFAIR_API_URL, {
+            // *** CAMBIO CLAVE: Se añade la URL del proxy a la petición fetch ***
+            const response = await fetch(PROXY_URL + BETFAIR_API_URL, {
                 method: 'POST',
                 body: JSON.stringify(body),
                 headers: {
+                    // *** CAMBIO CLAVE: Se añaden las cabeceras requeridas por el proxy y Betfair ***
+                    'x-cors-api-key': 'temp_1234567890', // Clave temporal para el proxy
                     'X-Application': appKey,
                     'X-Authentication': sessionToken,
                     'Content-Type': 'application/json',
@@ -246,9 +251,9 @@
                 }
             });
 
-            if (!response.ok) throw new Error(`Error de red: ${response.status} ${response.statusText}`);
+            if (!response.ok) throw new Error(`Error de red o del proxy: ${response.status} ${response.statusText}`);
             const data = await response.json();
-            if (data.error) throw new Error(`Error de la API: ${data.error.message} (${data.error.data?.exceptionname})`);
+            if (data.error) throw new Error(`Error de la API de Betfair: ${data.error.message} (${data.error.data?.exceptionname})`);
             
             return data;
         }
