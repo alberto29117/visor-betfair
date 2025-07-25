@@ -2,7 +2,5 @@
   "name": "betfair-functions-dependency",
   "version": "1.0.0",
   "description": "Dependencies for Netlify functions",
-  "dependencies": {
-    "node-fetch": "^2.6.1"
-  }
+  "dependencies": {}
 }
